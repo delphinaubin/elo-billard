@@ -1,49 +1,15 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import "./App.css";
-import { AddPlayer } from "./AddPlayer";
-import { Player } from "./Player";
-import { PlayersList } from "./PlayersList";
-import { isPlayerSelected } from "./IsPlayerSelected";
+import {AddPlayer} from "./AddPlayer";
+import {Player} from "./Player";
+import {PlayersList} from "./PlayersList";
+import {isPlayerSelected} from "./IsPlayerSelected";
+import {PlayerMatch} from "./PlayerMatch";
 
-const PlayerMatch = (props: { selectedPlayers: Player[] }) => {
-  const { selectedPlayers } = props;
-
-  const PlayerCard = (props: { player?: Player }) => {
-    const { player } = props;
-
-    if (!player) {
-      return <div className="box"> ? </div>;
-    }
-
-    return (
-      <div className="box">
-        <p>
-          {player.name} <strong>{player.elo}</strong>
-        </p>
-        <button className="button is-warning is-large mt-2" ><strong>{player.name}</strong>&nbsp; Win !</button>
-      </div>
-    );
-  };
-
-  if (selectedPlayers.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="columns is-mobile has-text-centered is-vcentered">
-      <div className="column is-size-2">
-        <PlayerCard player={selectedPlayers[0]} />
-      </div>
-      <div className="column is-size-1 is-one-fifth">VS</div>
-      <div className="column is-size-2">
-        <PlayerCard player={selectedPlayers[1]} />
-      </div>
-    </div>
-  );
-};
-
+const LOCAL_STORAGE_PLAYERS_KEY = "players";
+const INITIAL_PLAYER_STATE: Player[] = [];
 function App() {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYER_STATE);
   const addPlayer = (player: Player) => {
     const existingPlayerName = players.some((p) => p.name === player.name);
     if (!existingPlayerName) {
@@ -51,7 +17,23 @@ function App() {
     }
   };
 
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const [selectedPlayers, setSelectedPlayers] =
+    useState<Player[]>(INITIAL_PLAYER_STATE);
+
+  useEffect(() => {
+    if (players !== INITIAL_PLAYER_STATE) {
+      localStorage.setItem(LOCAL_STORAGE_PLAYERS_KEY, JSON.stringify(players));
+    }
+  }, [players]);
+
+  useEffect(() => {
+    const jsonPlayersInLocalStorage = localStorage.getItem(
+      LOCAL_STORAGE_PLAYERS_KEY
+    );
+    if (jsonPlayersInLocalStorage) {
+      setPlayers(JSON.parse(jsonPlayersInLocalStorage));
+    }
+  }, []);
 
   const onPlayerClick = (player: Player) => {
     if (isPlayerSelected(player, selectedPlayers)) {
@@ -66,6 +48,23 @@ function App() {
       }
     }
   };
+
+  const changePlayersScore = (playersWhoPlayed: [Player, Player]) => {
+    const [firstPlayer, secondPlayer] = playersWhoPlayed;
+    setPlayers(
+      players.map((p): Player => {
+        if (p.name === firstPlayer.name) {
+          return firstPlayer;
+        }
+        if (p.name === secondPlayer.name) {
+          return secondPlayer;
+        }
+        return p;
+      })
+    );
+    setSelectedPlayers([]);
+  };
+
   return (
     <>
       <section className="section">
@@ -78,7 +77,10 @@ function App() {
       </section>
       <section className="section">
         <div className="container">
-          <PlayerMatch selectedPlayers={selectedPlayers} />
+          <PlayerMatch
+            selectedPlayers={selectedPlayers}
+            onPlayerScoreChange={changePlayersScore}
+          />
         </div>
       </section>
       <section className="section">

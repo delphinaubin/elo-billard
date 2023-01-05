@@ -19,7 +19,7 @@ const PlayerListItem = (props: {
         "box"
       )}
     >
-      {player.name} <strong>{player.elo}</strong>
+      {player.name} <strong>{player.elo.toFixed(2)}</strong>
     </div>
   );
 };

@@ -17,7 +17,7 @@ export const AddPlayer = (props: { onAddPlayer: (player: Player) => void }) => {
     <>
       <div className="field is-horizontal">
         <div className="field-label is-normal">
-          <label className="label">Add a player</label>
+          <label className="label">Ajouter un joueur</label>
         </div>
         <div className="field-body">
           <div className="field">
