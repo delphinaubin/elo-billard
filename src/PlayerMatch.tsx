@@ -1,8 +1,13 @@
-import { Player } from "./Player";
+import { Player, PlayerWithRanking } from "./Player";
 import React from "react";
 import { EloScoreBuilder } from "./EloScoreBuilder";
+import { RankingIcon } from "./RankingIcon";
 
-const PlayerCard = (props: { player?: Player; onWinCLick: () => void, isWinButtonActive: boolean }) => {
+const PlayerCard = (props: {
+  player?: PlayerWithRanking;
+  onWinCLick: () => void;
+  isWinButtonActive: boolean;
+}) => {
   const { player, onWinCLick, isWinButtonActive } = props;
 
   if (!player) {
@@ -12,9 +17,14 @@ const PlayerCard = (props: { player?: Player; onWinCLick: () => void, isWinButto
   return (
     <div className="box">
       <p>
+        <RankingIcon ranking={player.ranking} />
         {player.name} <strong>{player.elo.toFixed(2)}</strong>
       </p>
-      <button onClick={onWinCLick} className="button is-warning is-large mt-2" disabled={!isWinButtonActive}>
+      <button
+        onClick={onWinCLick}
+        className="button is-warning is-large mt-2"
+        disabled={!isWinButtonActive}
+      >
         <strong>{player.name}</strong>&nbsp; gagne !
       </button>
     </div>
@@ -22,13 +32,17 @@ const PlayerCard = (props: { player?: Player; onWinCLick: () => void, isWinButto
 };
 
 export const PlayerMatch = (props: {
-  selectedPlayers: Player[];
+  selectedPlayers: PlayerWithRanking[];
   onPlayerScoreChange: (players: [Player, Player]) => void;
 }) => {
   const { selectedPlayers, onPlayerScoreChange } = props;
 
   if (selectedPlayers.length === 0) {
-    return <h1 className="subtitle is-center has-text-info is-size-3">Sélectionne deux joueurs pour une partie !</h1> ;
+    return (
+      <h1 className="subtitle is-center has-text-info is-size-3">
+        Sélectionne deux joueurs pour une partie !
+      </h1>
+    );
   }
 
   const playerWin = (playerWhoWon: 1 | 2) => () => {

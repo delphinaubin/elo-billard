@@ -1,10 +1,11 @@
-import {Player} from "./Player";
+import { Player, PlayerWithRanking } from "./Player";
 import React from "react";
 import classNames from "classnames";
-import {isPlayerSelected} from "./IsPlayerSelected";
+import { isPlayerSelected } from "./IsPlayerSelected";
+import { RankingIcon } from "./RankingIcon";
 
 const PlayerListItem = (props: {
-  player: Player;
+  player: PlayerWithRanking;
   click: () => void;
   isSelected: boolean;
 }) => {
@@ -19,6 +20,9 @@ const PlayerListItem = (props: {
         "box"
       )}
     >
+      <span className="icon">
+        <RankingIcon ranking={player.ranking} />
+      </span>
       {player.name} <strong>{player.elo.toFixed(2)}</strong>
     </div>
   );
@@ -27,13 +31,13 @@ const PlayerListItem = (props: {
 export const PlayersList = (props: {
   players: Player[];
   selectedPlayers: Player[];
-  onPlayerClick: (clickedPlayer: Player) => void;
+  onPlayerClick: (clickedPlayer: PlayerWithRanking) => void;
 }) => {
   const { players, selectedPlayers, onPlayerClick } = props;
 
   return (
     <>
-      {players.map((player) => {
+      {getSortedPlayersWithRanking(players).map((player) => {
         return (
           <PlayerListItem
             player={player}
@@ -48,3 +52,12 @@ export const PlayersList = (props: {
     </>
   );
 };
+
+function getSortedPlayersWithRanking(players: Player[]): PlayerWithRanking[] {
+  return players
+    .sort((a, b) => b.elo - a.elo)
+    .map((player, index) => ({
+      ...player,
+      ranking: index + 1,
+    }));
+}

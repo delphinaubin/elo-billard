@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
 import "./App.css";
 import {AddPlayer} from "./AddPlayer";
-import {Player} from "./Player";
+import {Player, PlayerWithRanking} from "./Player";
 import {PlayersList} from "./PlayersList";
 import {isPlayerSelected} from "./IsPlayerSelected";
 import {PlayerMatch} from "./PlayerMatch";
 
 const LOCAL_STORAGE_PLAYERS_KEY = "players";
-const INITIAL_PLAYER_STATE: Player[] = [];
+const INITIAL_PLAYER_STATE: PlayerWithRanking[] = [];
 function App() {
   const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYER_STATE);
   const addPlayer = (player: Player) => {
@@ -18,7 +18,7 @@ function App() {
   };
 
   const [selectedPlayers, setSelectedPlayers] =
-    useState<Player[]>(INITIAL_PLAYER_STATE);
+    useState<PlayerWithRanking[]>(INITIAL_PLAYER_STATE);
 
   useEffect(() => {
     if (players !== INITIAL_PLAYER_STATE) {
@@ -35,7 +35,7 @@ function App() {
     }
   }, []);
 
-  const onPlayerClick = (player: Player) => {
+  const onPlayerClick = (player: PlayerWithRanking) => {
     if (isPlayerSelected(player, selectedPlayers)) {
       setSelectedPlayers(
         selectedPlayers.filter((sp) => sp.name !== player.name)
@@ -75,7 +75,7 @@ function App() {
           </p>
         </div>
       </section>
-      <section className="section">
+      <section className="section pt-0 pb-0">
         <div className="container">
           <PlayerMatch
             selectedPlayers={selectedPlayers}
