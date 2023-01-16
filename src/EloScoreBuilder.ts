@@ -45,6 +45,9 @@ export class EloScoreBuilder {
     return this;
   }
 
+  /**
+   * @see https://metinmediamath.wordpress.com/2013/11/27/how-to-calculate-the-elo-rating-including-example/
+   */
   computeScore(): ComputedEloScore {
     if (
       this.firstPlayerEloScore === undefined ||
@@ -55,26 +58,23 @@ export class EloScoreBuilder {
       );
     }
 
-    const scoreDelta = +(
-      this.kFactor *
-      (1 /
-        (1 +
-          Math.pow(
-            10,
-            (this.firstPlayerEloScore - this.secondPlayerEloScore) / 400
-          )))
-    ).toFixed(1);
+    const r1 = Math.pow(10, this.firstPlayerEloScore / 400);
+    const r2 = Math.pow(10, this.secondPlayerEloScore / 400);
+    const probabilityFirstPlayerWin = r1 / (r1 + r2);
+    const probabilitySecondPlayerWin = r2 / (r2 + r1);
+    const s1 = this.playerNumberWhoWon === 1 ? 1 : 0;
+    const s2 = this.playerNumberWhoWon === 2 ? 1 : 0;
 
-    if (this.playerNumberWhoWon === 1) {
-      return {
-        eloPlayerOne: this.firstPlayerEloScore + scoreDelta,
-        eloPlayerTwo: this.secondPlayerEloScore - scoreDelta,
-      };
-    } else {
-      return {
-        eloPlayerOne: this.firstPlayerEloScore - scoreDelta,
-        eloPlayerTwo: this.secondPlayerEloScore + scoreDelta,
-      };
-    }
+    const newFirstPlayerScore =
+      this.firstPlayerEloScore +
+      this.kFactor * (s1 - probabilityFirstPlayerWin);
+    const newSecondPlayerScore =
+      this.secondPlayerEloScore +
+      this.kFactor * (s2 - probabilitySecondPlayerWin);
+
+    return {
+      eloPlayerOne: +newFirstPlayerScore.toFixed(1),
+      eloPlayerTwo: +newSecondPlayerScore.toFixed(1),
+    };
   }
 }
